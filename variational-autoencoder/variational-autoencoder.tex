@@ -1,0 +1,41 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{amsmath}
+
+\title{Variational AutoEncoder}
+\author{Shuguo.J}
+
+\begin{document}
+\maketitle
+\section*{Content}
+AutoEncoder注重encoder模块，将高维数据转换为code/represention；而Variational AutoEncoder则注重decoder模块，根据服从某一分布的样本code来生成样本。在AutoEncoder中，隐变量z由encoder编码而来，因此我们并不知道其它服从的分布的形式。这导致我们无法隐变量z服从的分布中进行采样，然后通过decoder来生成数据样本。Variational AutoEncoder则在训练的过程中通过KL Divergence来约束隐变量z的分布，用先验概率 $P(z)$ 来拟合复杂的后验概率 $P(z|x)$。
+
+
+在encoder模块,Variational AutoEncoder不是输出固定的code/represention，而是输出$\mu$和$\sigma^{2}$,之后在从$N(\mu,\sigma^{2})$（假设后验概率$P(z|x)$为高斯分布）采样得到code--$z$。为了使得模型可导，这里引入随机变量$\epsilon \sim N(0,1)$,令$z=\mu + \epsilon \times \sigma^2$，并以此来代替上述的随机采样。在这里，损失函数就能够对$\mu$和$\sigma^2$进行求导，而其无需对$\epsilon$求导。同时，$z\sim N(\mu, \sigma^2)$。
+
+\textbf{Variational AutoEncoder的完整公式推导我还没有完全理解好。待更新\dots}
+
+\section*{Appendix}
+KL divergence如下所示：
+\begin{equation}
+D_{kl}(p(x)|q(x)) = \int{p(x)log \frac{p(x)}{q(x)}dx}
+\end{equation}
+
+
+KL散度代表着用分布$q(x)$来拟合$p(x)$的差异程度。
+
+当$p(x)$和$q(x)$均为高斯分数时，
+
+
+\begin{equation}
+\begin{aligned}
+D_{kl}(p(x)|q(x))=&\int{p(x)\times (log\frac{1}{\sqrt{2\pi \sigma^{2}_{1}}}e^-\frac{(x-\mu_{1})^{2}}{2\sigma^{2}_{1}}-log\frac{1}{\sqrt{2\pi \sigma^{2}_{2}}}e^-\frac{(x-\mu_{2})^{2}}{2\sigma^{2}_{2}})dx} \\
+=&\int{p(x)\times (log\frac{1}{\sqrt{2\pi \sigma^2_1}}+loge^{-\frac{(x-\mu_1)^2}{2\sigma^2_1}}-log\frac{1}{\sqrt{2\pi \sigma^2_2}}-loge^{-\frac{(x-\mu_2)^2}{2\sigma^2_2}})dx}\\
+=&\int{p(x)\times (-\frac{1}{2}log2\pi-log\sigma_1-\frac{(x-\mu_1)^2}{2\sigma^2_1}+\frac{1}{2}log2\pi+log\sigma_2+\frac{(x-\mu_2)^2}{2\sigma^2_2})dx}\\
+=&\int{p(x)\times (log\frac{\sigma_2}{\sigma_1}-\frac{(x-\mu_1)^2}{2\sigma_1^2}+\frac{(x-\mu_2)^2}{2\sigma_2^2})dx}\\
+=&log\frac{\sigma_2}{\sigma_1}+\int{p(x)\times \frac{(x-\mu_2)^2}{2\sigma_2^2}dx}-\int{p(x)\frac{(x-\mu_1)^2}{2\sigma_1^2}dx}\\
+=&log\frac{\sigma_2}{\sigma_1}+\frac{1}{2\sigma_2^2}\int{p(x)(x-\mu_1+\mu_1-\mu_2)^2dx}-\frac{1}{2}\\
+=&log\frac{\sigma_2}{\sigma_1}+\frac{\sigma^2+(\mu_2-\mu_2)^2}{2\sigma_2^2}-\frac{1}{2}
+\end{aligned}
+\end{equation}
+\end{document}
+
