@@ -1,2 +1,2 @@
 # Variational-AutoEncoder
-[Introduction of Variational AutoEncoder](Variational-AutoEncoder/variational-autoencoder.pdf)
+[Introduction of Variational AutoEncoder.pdf](Variational-AutoEncoder/variational-autoencoder.pdf)
